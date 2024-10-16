@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Round-Based Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .modal {
+      display: none !important;
+    }
+    .modal.active {
+      display: block !important;
+      position: fixed;
+    }
+  </style>
+</head>
+<body class="bg-white flex flex-col items-center h-screen">
+    <div class="flex justify-center items-center mb-6 w-full bg-[#FFB6C1] p-4">
+        <div class="max-w-3xl flex justify-between items-center w-full">
+        <div class="text-center">
+          <div id="team1-name" class="bg-pink-500 text-white font-bold text-lg px-4 py-1 rounded">Time 1</div>
+          <div id="team1-score" class="text-4xl font-bold mt-2">0</div>
+        </div>
+        <div class="text-center">
+          <div id="team2-name" class="bg-yellow-500 text-white font-bold text-lg px-4 py-1 rounded">Time 2</div>
+          <div id="team2-score" class="text-4xl font-bold mt-2">0</div>
+        </div>
+    </div>
+      </div>
+
+  <div class=" w-full max-w-3xl p-6 rounded-lg  mt-4 ">
+  
+
+  
+    <div id="questions-grid" class="grid grid-cols-4 gap-y-4 gap-x-2 justify-center items-center">  </div>
+
+
+  <div id="modal" class="modal fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+      <h2 id="modal-question" class="text-2xl font-bold mb-4"></h2>
+      <div class="flex justify-around">
+        <button class="bg-green-500 text-white font-bold py-2 px-4 rounded" onclick="processAnswer(10)">Acerto</button>
+        <button class="bg-red-500 text-white font-bold py-2 px-4 rounded" onclick="processAnswer(-5)">Erro</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="answer-modal" class="modal fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+      <h2 id="modal-answer" class="text-2xl font-bold mb-4"></h2>
+      <div class="flex justify-around">
+        <button class="bg-blue-500 text-white font-bold py-2 px-4 rounded" onclick="closeAnswerModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+    "O que é considerado uma alimentação equilibrada?",
+"Quantos litros de água é recomendado beber por dia?",
+"Qual grupo alimentar fornece a maior quantidade de energia?",
+"Exemplos de alimentos ricos em fibras?",
+"Qual é a principal função das proteínas no corpo?",
+"Qual vitamina é essencial para a saúde dos ossos?",
+"Quais alimentos são fontes de gorduras saudáveis?",
+"Comer frutas e vegetais pode prevenir quais tipos de doenças?",
+"O que significa o termo \"alimentos ultraprocessados\"?",
+"Qual é a quantidade diária recomendada de açúcar para adultos?",
+"O que é o índice glicêmico dos alimentos?",
+"Quais alimentos são boas fontes de cálcio?",
+"Por que o consumo excessivo de sal é prejudicial à saúde?",
+"O que são carboidratos complexos?",
+"Qual é a função da vitamina C no corpo?",
+"Por que é importante variar os tipos de alimentos consumidos diariamente?"
+    ];
+
+    const answers = [
+    "Uma alimentação que inclui todos os grupos alimentares em quantidades adequadas.",
+"Cerca de 2 litros por dia.",
+"Carboidratos.",
+"Grãos integrais, frutas e vegetais.",
+"Construção e reparo de tecidos.",
+"Vitamina D.",
+"Abacate, azeite de oliva, nozes e peixes.",
+"Doenças cardíacas e câncer.",
+"Alimentos industrializados com muitos aditivos e conservantes.",
+"Até 50g por dia.",
+"A velocidade com que um alimento aumenta o nível de açúcar no sangue.",
+"Leite, queijo, iogurte, vegetais de folhas verdes.",
+"Pode causar hipertensão e problemas cardíacos.",
+"Carboidratos que são digeridos lentamente, como grãos integrais e legumes.",
+"Auxilia na imunidade e na absorção de ferro.",
+"Para garantir a ingestão de todos os nutrientes necessários."
+    ];
+
+    let currentTeam = 1; 
+    let team1Score = 0;
+    let team2Score = 0;
+    let currentQuestionIndex = null;
+    let answeredQuestions = []; 
+
+    const renderQuestions = () => {
+      const grid = document.getElementById('questions-grid');
+      grid.innerHTML = ''; 
+
+      questions.forEach((question, index) => {
+        const button = document.createElement('button');
+        button.className = 'w-full bg-blue-500 text-white font-bold text-xl py-6 px-6 rounded-lg  h-32'; 
+        button.textContent = index + 1; 
+
+        if (answeredQuestions.includes(index)) {
+          button.className = 'w-full bg-gray-400 text-gray-700 font-bold text-xl py-6 px-6 rounded-lg  h-32';
+          button.disabled = true;
+        } else {
+          button.onclick = () => openModal(index); 
+        }
+
+        grid.appendChild(button);
+      });
+    };
+
+    function openModal(index) {
+      currentQuestionIndex = index; 
+      document.getElementById('modal-question').textContent = questions[index]; 
+      document.getElementById('modal').classList.add('active');
+    }
+
+    function processAnswer(points) {
+      addPoints(points);
+      showAnswer(); 
+    }
+
+    function addPoints(v) {
+      answeredQuestions.push(currentQuestionIndex);
+      
+      if (currentTeam === 1) {
+        team1Score += v;
+        document.getElementById('team1-score').textContent = team1Score;
+      } else {
+        team2Score += v;
+        document.getElementById('team2-score').textContent = team2Score;
+      }
+      document.getElementById('modal').classList.remove('active');
+
+      renderQuestions();
+      toggleTeam();
+    }
+
+    function toggleTeam() {
+      currentTeam = currentTeam === 1 ? 2 : 1;
+      if(currentTeam === 1) {
+        document.getElementById('team1-name').classList.add('bg-pink-500');
+        document.getElementById('team2-name').classList.remove('bg-yellow-500');
+      } else {
+        document.getElementById('team1-name').classList.remove('bg-pink-500');
+        document.getElementById('team2-name').classList.add('bg-yellow-500');
+      }
+    }
+
+    function showAnswer() {
+      document.getElementById('modal-answer').textContent = answers[currentQuestionIndex]; 
+      document.getElementById('answer-modal').classList.add('active');
+    }
+
+    function closeAnswerModal() {
+      document.getElementById('answer-modal').classList.remove('active');
+    }
+
+    window.onload = renderQuestions;
+  </script>
+</body>
+</html>
