@@ -35,19 +35,20 @@
   
     <div id="questions-grid" class="grid grid-cols-4 gap-y-4 gap-x-2 justify-center items-center">  </div>
 
-
-  <div id="modal" class="modal fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
-    <div class="bg-white p-6 rounded-lg shadow-lg">
-      <h2 id="modal-question" class="text-2xl font-bold mb-4"></h2>
-      <div class="flex justify-around">
-        <button class="bg-green-500 text-white font-bold py-2 px-4 rounded" onclick="processAnswer(10)">Acerto</button>
-        <button class="bg-red-500 text-white font-bold py-2 px-4 rounded" onclick="processAnswer(-5)">Erro</button>
-      </div>
+<div id="modal" class="modal fixed bottom-0 left-0 w-full bg-black bg-opacity-50 flex justify-center items-end">
+  <div class="bg-white p-6 rounded-lg shadow-lg">
+    <h2 id="modal-question" class="text-2xl font-bold mb-4"></h2>
+    <div class="flex justify-around">
+      <button class="bg-green-500 text-white font-bold py-2 px-4 rounded" onclick="processAnswer(10)">Acerto</button>
+      <button class="bg-red-500 text-white font-bold py-2 px-4 rounded" onclick="processAnswer(-5)">Erro</button>
     </div>
   </div>
+</div>
+
+    
 
 
-  <div id="answer-modal" class="modal fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+  <div id="answer-modal" class="modal fixed bottom-0 left-0 w-full bg-black bg-opacity-50 flex justify-center items-end">
     <div class="bg-white p-6 rounded-lg shadow-lg">
       <h2 id="modal-answer" class="text-2xl font-bold mb-4"></h2>
       <div class="flex justify-around">
@@ -73,7 +74,7 @@
 "Por que o consumo excessivo de sal é prejudicial à saúde?",
 "O que são carboidratos complexos?",
 "Qual é a função da vitamina C no corpo?",
-"Por que é importante variar os tipos de alimentos consumidos diariamente?"
+"Por que é importante variar os tipos de alimentos consumidos diariamente?" 
     ];
 
     const answers = [
@@ -107,11 +108,11 @@
 
       questions.forEach((question, index) => {
         const button = document.createElement('button');
-        button.className = 'w-full bg-blue-500 text-white font-bold text-xl py-6 px-6 rounded-lg  h-32'; 
+        button.className = 'w-full bg-blue-500 text-white font-bold text-xl p-4 rounded-lg  h-32'; 
         button.textContent = index + 1; 
 
         if (answeredQuestions.includes(index)) {
-          button.className = 'w-full bg-gray-400 text-gray-700 font-bold text-xl py-6 px-6 rounded-lg  h-32';
+          button.className = 'w-full bg-gray-400 text-gray-700 font-bold text-xl p-4 rounded-lg  h-32';
           button.disabled = true;
         } else {
           button.onclick = () => openModal(index); 
@@ -122,6 +123,8 @@
     };
 
     function openModal(index) {
+    
+
       currentQuestionIndex = index; 
       document.getElementById('modal-question').textContent = questions[index]; 
       document.getElementById('modal').classList.add('active');
@@ -144,6 +147,8 @@
       }
       document.getElementById('modal').classList.remove('active');
 
+      
+
       renderQuestions();
       toggleTeam();
     }
@@ -160,6 +165,16 @@
     }
 
     function showAnswer() {
+      if (answeredQuestions.length === questions.length) {
+        if(team1Score > team2Score) {
+          alert('Time 1 venceu!');
+        } else if(team2Score > team1Score) {
+          alert('Time 2 venceu!');
+        } else {
+          alert('Empate!');
+        }
+        return;
+      }
       document.getElementById('modal-answer').textContent = answers[currentQuestionIndex]; 
       document.getElementById('answer-modal').classList.add('active');
     }
